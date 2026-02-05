@@ -13,7 +13,13 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  images: { unoptimized: true },
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [320, 420, 560, 640, 750, 828, 1080],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+  },
+  // Reduz polyfills para navegadores modernos
+  transpilePackages: [],
 };
 
 module.exports = nextConfig;

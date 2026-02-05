@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Diagnóstico Financeiro - Descubra quanto você está perdendo',
     description: 'Diagnóstico financeiro gratuito em 2 minutos. Descubra quanto dinheiro você está perdendo sem perceber.',
-    images: ['/og-image.png'],
+    images: ['/og-image.webp'],
   },
 };
 
@@ -43,10 +43,35 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
+        {/* Preconnect para origens críticas - melhora LCP em ~350-320ms */}
+        <link rel="preconnect" href="https://api6.ipify.org" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://tracking.utmify.com.br" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://apps.abacus.ai" />
+        <link rel="dns-prefetch" href="https://mpc-prod-14-s6uit34pua-ue.a.run.app" />
+
+        {/* Abacus AI - carregado após interação para não bloquear render */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.pixelId = "69530b208ca5e6056799814f";`,
+            __html: `
+              window.pixelId = "69530b208ca5e6056799814f";
+              // Carrega Abacus apenas após primeira interação do usuário
+              var abacusLoaded = false;
+              function loadAbacus() {
+                if (abacusLoaded) return;
+                abacusLoaded = true;
+                var s = document.createElement('script');
+                s.src = 'https://apps.abacus.ai/chatllm/appllm-lib.js';
+                s.async = true;
+                document.head.appendChild(s);
+              }
+              ['click', 'scroll', 'touchstart', 'mousemove'].forEach(function(e) {
+                document.addEventListener(e, loadAbacus, { once: true, passive: true });
+              });
+              // Fallback: carrega após 3s se não houver interação
+              setTimeout(loadAbacus, 3000);
+            `,
           }}
         />
         <script

@@ -201,7 +201,7 @@ export function OfferScreenPT({ totalValue }: OfferScreenProps) {
           {/* Mockup visual */}
           <div className="flex justify-center">
             <Image
-              src="/planilha-mockup.png"
+              src="/planilha-mockup.webp"
               alt="Planilha de organizacao e controle financeiro"
               width={400}
               height={300}
@@ -366,6 +366,7 @@ export function OfferScreenPT({ totalValue }: OfferScreenProps) {
                       src={review.image}
                       alt={review.name}
                       fill
+                      sizes="48px"
                       className="object-cover"
                       loading="eager"
                     />

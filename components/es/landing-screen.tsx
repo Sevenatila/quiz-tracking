@@ -41,9 +41,10 @@ export default function LandingScreenES({ onStart }: LandingScreenProps) {
           className="mb-3 relative w-full aspect-square max-w-[320px] mx-auto"
         >
           <Image
-            src="/hamster-wheel-es.png"
+            src="/hamster-wheel-es.webp"
             alt="¿Así es como te sientes? Trabajas para ganar dinero para pagar cuentas hasta quedarte sin dinero"
             fill
+            sizes="(max-width: 768px) 320px, 320px"
             className="object-contain rounded-2xl"
             priority
           />

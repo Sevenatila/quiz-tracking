@@ -41,9 +41,10 @@ export default function LandingScreenPT({ onStart }: LandingScreenProps) {
           className="mb-3 relative w-full aspect-square max-w-[320px] mx-auto"
         >
           <Image
-            src="/hamster-wheel-pt.png"
+            src="/hamster-wheel.webp"
             alt="Trabalha para ganhar dinheiro para pagar contas ate ficar sem dinheiro"
             fill
+            sizes="(max-width: 768px) 320px, 320px"
             className="object-contain rounded-2xl"
             priority
           />
