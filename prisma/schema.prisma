@@ -1,0 +1,71 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Sessão do quiz - cada visitante gera uma sessão
+model QuizSession {
+  id              String    @id @default(cuid())
+  sessionId       String    @unique // ID único do navegador
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  // Progresso
+  currentStep     String    @default("landing") // landing, q1, q2, ..., q7, results, offer
+  lastActiveAt    DateTime  @default(now())
+
+  // Dados coletados
+  incomeRange     String?
+  estimatedLoss   Float?
+
+  // Metadados
+  userAgent       String?
+  referrer        String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+
+  // Facebook Pixel / CAPI
+  fbp             String?   // cookie _fbp
+  fbc             String?   // cookie _fbc
+  fbclid          String?   // parametro fbclid da URL
+
+  // Conversão
+  clickedOffer    Boolean   @default(false)
+  clickedOfferAt  DateTime?
+
+  @@index([startedAt])
+  @@index([currentStep])
+}
+
+// Pedidos/Compras - conecta com Stripe
+model Order {
+  id                   String    @id @default(cuid())
+  stripePaymentIntentId String   @unique
+  customerEmail        String
+  amount               Float
+  currency             String    @default("usd")
+  status               String    @default("pending") // pending, paid, failed
+  productDelivered     Boolean   @default(false)
+
+  // Metadados do Stripe
+  source               String?   // ex: embedded_checkout_es
+  baseAmount           Float?
+  orderBumps           String?   // JSON array de order bumps
+  orderBumpPrices      String?   // JSON array de preços dos order bumps
+  orderBumpProducts    String?   // JSON array de produtos dos order bumps
+
+  // Timestamps
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  paidAt               DateTime?
+  deliveredAt          DateTime?
+
+  @@index([customerEmail])
+  @@index([status])
+  @@index([createdAt])
+}
