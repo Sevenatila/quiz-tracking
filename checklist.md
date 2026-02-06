@@ -14,10 +14,8 @@
 ### 1.1 Instalacao do Pixel Base
 - [x] Adicionar `NEXT_PUBLIC_FACEBOOK_PIXEL_ID` no `.env`
 - [x] Criar utilitario `/lib/facebook-pixel.ts` com funcoes helper (pageview, track, etc.)
-- [x] ~~Inserir script base do pixel no `app/layout.tsx`~~ → Migrado para Google Tag Manager (GTM)
-- [x] Configurar GTM (`NEXT_PUBLIC_GTM_ID=GTM-PSMTNWMF`) no `.env` e `layout.tsx`
-- [x] Configurar tag do Facebook Pixel dentro do GTM (HTML personalizado + trigger All Pages)
-- [x] Garantir que o pixel carrega em todas as paginas (via GTM)
+- [x] Inserir script base do pixel no `app/layout.tsx` (noscript + script)
+- [x] Garantir que o pixel carrega em todas as paginas
 - [ ] Testar com extensao Meta Pixel Helper no navegador
 
 ### 1.2 Eventos Padrao do Funil
@@ -67,12 +65,7 @@
 - [x] `InitiateCheckout` - no endpoint `/api/tracking` quando clickedOffer = true
 - [x] `Purchase` - via webhook da Vega (`/api/vega-webhook`) quando `payment_status === 'approved'`
 
-### 2.5 Correlacao Sessao-Compra
-- [x] Passar `sessionId` via parametro `src` na URL do checkout da Vega
-- [x] Atualizar offer-screen (PT, ES, EN) e back-redirect (PT, ES) com URL dinamica
-- [x] Webhook busca sessao exata por `utms.src` (fallback: sessao mais recente)
-
-### ~~2.6 Purchase via Stripe Webhook~~ (STANDBY - Stripe nao utilizado)
+### ~~2.5 Purchase via Stripe Webhook~~ (STANDBY - Stripe nao utilizado)
 - ~~No evento `payment_intent.succeeded`, enviar Purchase para a CAPI~~
 - ~~Incluir `value`, `currency`, `order_id` nos parametros~~
 - ~~Recuperar `fbp` e `fbc` do banco~~
