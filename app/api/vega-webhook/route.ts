@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { sendCAPIEvent } from '@/lib/facebook-capi';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,45 +55,17 @@ export async function POST(request: NextRequest) {
     // Busca a sessão do quiz pelo sessionId passado via src na URL do checkout
     // Fallback: sessão mais recente com clickedOffer se src não estiver disponível
     const sessionIdFromSrc = body.utms?.src;
-    let session = null;
     try {
       if (sessionIdFromSrc) {
-        session = await prisma.quizSession.findUnique({
+        await prisma.quizSession.findUnique({
           where: { sessionId: sessionIdFromSrc },
-        });
-      }
-      if (!session) {
-        session = await prisma.quizSession.findFirst({
-          where: { clickedOffer: true },
-          orderBy: { clickedOfferAt: 'desc' },
         });
       }
     } catch (e) {
       console.error('[Vega Webhook] Error finding session:', e);
     }
 
-    // Envia Purchase para Facebook CAPI
-    await sendCAPIEvent({
-      event_name: 'Purchase',
-      event_id: `purchase_${transactionToken}`,
-      user_data: {
-        fbp: session?.fbp || undefined,
-        fbc: session?.fbc || undefined,
-        fbclid: session?.fbclid || undefined,
-        external_id: session?.sessionId || undefined,
-        em: body.customer?.email || undefined,
-        ph: body.customer?.cellphone || undefined,
-      },
-      custom_data: {
-        value: amountInReais,
-        currency: 'BRL',
-        content_name: body.products?.[0]?.title || 'Planilha Financeira',
-        content_type: 'product',
-        order_id: transactionToken,
-      },
-    });
-
-    console.log(`[Vega Webhook] Purchase sent - ${transactionToken} R$${amountInReais}`);
+    console.log(`[Vega Webhook] Purchase received - ${transactionToken} R$${amountInReais}`);
 
     return NextResponse.json({ received: true });
   } catch (error) {

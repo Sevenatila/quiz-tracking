@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { AnimatePresence } from 'framer-motion';
 import LandingScreen from '@/components/landing-screen';
 import QuestionScreen from '@/components/question-screen';
 import TransitionScreen from '@/components/transition-screen';
 import ResultsScreen from '@/components/results-screen';
-import { OfferScreenPT } from '@/components/pt/offer-screen';
 import { quizQuestions, calculateEstimatedValue, incomeRanges } from '@/lib/quiz-data';
 import { useTracking } from '@/hooks/use-tracking';
+
+const OfferScreenPT = dynamic(() => import('@/components/pt/offer-screen').then(mod => mod.OfferScreenPT), { ssr: false });
 
 type Screen = 'landing' | 'question' | 'transition' | 'results' | 'offer';
 

@@ -18,8 +18,6 @@ export const viewport: Viewport = {
   themeColor: '#0f172a',
 };
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
   title: 'Diagnóstico Financeiro - Descubra quanto você está perdendo',
@@ -46,7 +44,6 @@ export default function RootLayout({
         {/* Preconnect para origens críticas - melhora LCP em ~350-320ms */}
         <link rel="preconnect" href="https://api6.ipify.org" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://tracking.utmify.com.br" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://apps.abacus.ai" />
         <link rel="dns-prefetch" href="https://mpc-prod-14-s6uit34pua-ue.a.run.app" />
 
@@ -69,7 +66,7 @@ export default function RootLayout({
                 document.addEventListener(e, loadAbacus, { once: true, passive: true });
               });
               // Fallback: carrega após 3s se não houver interação
-              setTimeout(loadAbacus, 3000);
+              setTimeout(loadAbacus, 5000);
             `,
           }}
         />
@@ -78,24 +75,6 @@ export default function RootLayout({
           defer
           src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"
         ></script>
-        {/* Facebook Pixel - inicialização direta (sem GTM) */}
-        {process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window,document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '${process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID}');
-              `,
-            }}
-          />
-        )}
       </head>
       <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         {children}
