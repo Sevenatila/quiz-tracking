@@ -65,6 +65,41 @@ function createSuccessSound(audioContext: AudioContext): void {
   });
 }
 
+function createTickSound(audioContext: AudioContext): void {
+  const t = audioContext.currentTime;
+
+  // Camada 1: impacto metálico agudo (o "toc" do relógio)
+  const osc1 = audioContext.createOscillator();
+  const gain1 = audioContext.createGain();
+  const filter = audioContext.createBiquadFilter();
+  osc1.connect(filter);
+  filter.connect(gain1);
+  gain1.connect(audioContext.destination);
+  osc1.type = 'square';
+  osc1.frequency.setValueAtTime(3500, t);
+  osc1.frequency.exponentialRampToValueAtTime(1500, t + 0.008);
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(2500, t);
+  filter.Q.setValueAtTime(5, t);
+  gain1.gain.setValueAtTime(0.06, t);
+  gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  osc1.start(t);
+  osc1.stop(t + 0.03);
+
+  // Camada 2: corpo/ressonância grave (dá peso ao tick)
+  const osc2 = audioContext.createOscillator();
+  const gain2 = audioContext.createGain();
+  osc2.connect(gain2);
+  gain2.connect(audioContext.destination);
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(400, t);
+  osc2.frequency.exponentialRampToValueAtTime(200, t + 0.015);
+  gain2.gain.setValueAtTime(0.03, t);
+  gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+  osc2.start(t);
+  osc2.stop(t + 0.025);
+}
+
 export function useSound() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const isEnabledRef = useRef(true);
@@ -112,6 +147,15 @@ export function useSound() {
     }
   }, [getAudioContext]);
 
+  // Som de tick (cronômetro)
+  const playTickSound = useCallback(() => {
+    if (!isEnabledRef.current) return;
+    const ctx = getAudioContext();
+    if (ctx) {
+      createTickSound(ctx);
+    }
+  }, [getAudioContext]);
+
   // Toggle som
   const toggleSound = useCallback((enabled: boolean) => {
     isEnabledRef.current = enabled;
@@ -130,6 +174,7 @@ export function useSound() {
     playCoinSound,
     playClickSound,
     playSuccessSound,
+    playTickSound,
     toggleSound,
   };
 }

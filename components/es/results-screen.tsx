@@ -42,7 +42,7 @@ export default function ResultsScreenES({ totalValue, incomeIndex, onContinue }:
   
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    const timer = setTimeout(() => playSuccessSound(), 300);
+    const timer = setTimeout(() => playSuccessSound(), 100);
     return () => clearTimeout(timer);
   }, [playSuccessSound]);
   
@@ -110,7 +110,7 @@ export default function ResultsScreenES({ totalValue, incomeIndex, onContinue }:
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.05 }}
           className="text-center mb-4"
         >
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30 mb-3">
@@ -128,7 +128,7 @@ export default function ResultsScreenES({ totalValue, incomeIndex, onContinue }:
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.1 }}
           className="bg-gradient-to-br from-red-100 to-orange-100 rounded-xl p-4 mb-4 border border-red-200"
         >
           <p className="text-slate-600 text-xs mb-1">Estimación de pérdida mensual</p>
@@ -142,7 +142,7 @@ export default function ResultsScreenES({ totalValue, incomeIndex, onContinue }:
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.15 }}
           className="grid grid-cols-2 gap-2 mb-4"
         >
           {(stats ?? []).map((stat, index) => {
@@ -152,7 +152,7 @@ export default function ResultsScreenES({ totalValue, incomeIndex, onContinue }:
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + index * 0.1 }}
+                transition={{ delay: 0.2 + index * 0.05 }}
                 className={`${stat?.bgColor ?? 'bg-white'} rounded-lg p-3 border ${stat?.borderColor ?? 'border-slate-200'}`}
               >
                 <Icon className={`w-4 h-4 ${stat?.color ?? 'text-slate-600'} mb-1`} />
@@ -171,7 +171,7 @@ export default function ResultsScreenES({ totalValue, incomeIndex, onContinue }:
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.3 }}
           className="text-center"
         >
           <p className="text-slate-500 text-sm mb-3">

@@ -24,10 +24,10 @@ export default function TransitionScreen({ onComplete }: TransitionScreenProps) 
           return prev + 1;
         }
         clearInterval(interval);
-        setTimeout(onComplete, 150);
+        setTimeout(onComplete, 400);
         return prev;
       });
-    }, 350);
+    }, 800);
 
     return () => clearInterval(interval);
   }, [onComplete]);

@@ -75,6 +75,13 @@ export default function RootLayout({
           defer
           src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"
         ></script>
+        <script
+          async
+          defer
+          src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+          data-utmify-prevent-xcod-sck=""
+          data-utmify-prevent-subids=""
+        ></script>
       </head>
       <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         {children}

@@ -10,7 +10,7 @@ import ResultsScreen from '@/components/results-screen';
 import { quizQuestions, calculateEstimatedValue, incomeRanges } from '@/lib/quiz-data';
 import { useTracking } from '@/hooks/use-tracking';
 
-const OfferScreenPT = dynamic(() => import('@/components/pt/offer-screen').then(mod => mod.OfferScreenPT), { ssr: false });
+const OfferScreenPT = dynamic(() => import('@/components/pt/offer-screen').then(mod => mod.OfferScreenPT), { loading: () => null });
 
 type Screen = 'landing' | 'question' | 'transition' | 'results' | 'offer';
 
