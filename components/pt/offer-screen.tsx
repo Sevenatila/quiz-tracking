@@ -50,12 +50,12 @@ export function OfferScreenPT({ totalValue }: OfferScreenProps) {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const ctaRef = useRef<HTMLAnchorElement>(null);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
-  const [checkoutUrl, setCheckoutUrl] = useState('https://checkout.planilhaorganizacaofinanceira.online/VCCL1O8SCMGO');
+  const [checkoutUrl, setCheckoutUrl] = useState('https://pay.wiapy.com/Lfuk9cRXOe?payment_method=pix');
 
   useEffect(() => {
     const sid = localStorage.getItem('quiz_session_id');
     if (sid) {
-      setCheckoutUrl(`https://checkout.planilhaorganizacaofinanceira.online/VCCL1O8SCMGO?src=${sid}`);
+      setCheckoutUrl(`https://pay.wiapy.com/Lfuk9cRXOe?payment_method=pix&src=${sid}`);
     }
   }, []);
 
