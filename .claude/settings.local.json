@@ -12,7 +12,11 @@
       "Bash(ls:*)",
       "Bash(git push:*)",
       "Bash(npx next build:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx next dev)",
+      "Bash(powershell:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

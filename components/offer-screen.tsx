@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ShieldCheck, ChevronDown, Zap, Clock, Infinity, Star, CheckCircle, Play } from 'lucide-react';
+import { Check, ShieldCheck, ChevronDown, Zap, Clock, Star, CheckCircle, Play } from 'lucide-react';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/quiz-data';
 import { useTracking } from '@/hooks/use-tracking';
