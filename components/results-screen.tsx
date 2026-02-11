@@ -103,6 +103,7 @@ export default function ResultsScreen({ totalValue, incomeIndex, onContinue }: R
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ exit: { duration: 0.15 } }}
       className="min-h-screen flex items-center justify-center px-4 py-4"
     >
       <div className="max-w-lg w-full">

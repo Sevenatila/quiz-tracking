@@ -239,9 +239,9 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         
         {/* Bloco 1 — Dor/Impacto */}
         <motion.section
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.3 }}
           className="text-center space-y-6"
         >
           <h1 className="text-3xl md:text-4xl font-bold leading-tight text-slate-900">
@@ -279,7 +279,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
+          transition={{ duration: 0.3, delay: 0.03 }}
           className="space-y-6"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-900">
@@ -297,7 +297,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
           className="bg-slate-50 rounded-2xl p-6 border border-slate-200"
         >
           <h3 className="text-xl font-bold text-center text-slate-900 mb-6">
@@ -338,7 +338,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
+          transition={{ duration: 0.3, delay: 0.07 }}
           className="text-center space-y-4"
         >
           <h3 className="text-2xl font-bold text-slate-900">
@@ -368,7 +368,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+          transition={{ duration: 0.3, delay: 0.09 }}
           className="space-y-4"
         >
           <motion.a
@@ -392,7 +392,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.25 }}
+          transition={{ duration: 0.3, delay: 0.11 }}
           className="space-y-6"
         >
           <h3 className="text-xl font-bold text-center text-slate-900">
@@ -439,7 +439,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.13 }}
           className="space-y-4"
         >
           <h3 className="text-xl font-bold text-center text-slate-900">
@@ -462,7 +462,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
           className="text-center text-xs text-slate-400 pb-8"
         >
           <p>Aviso importante sobre este produto</p>

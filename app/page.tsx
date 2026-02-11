@@ -10,7 +10,16 @@ import ResultsScreen from '@/components/results-screen';
 import { quizQuestions, calculateEstimatedValue, incomeRanges } from '@/lib/quiz-data';
 import { useTracking } from '@/hooks/use-tracking';
 
-const OfferScreen = dynamic(() => import('@/components/offer-screen').then(mod => mod.OfferScreen), { loading: () => null });
+const OfferScreen = dynamic(() => import('@/components/offer-screen').then(mod => mod.OfferScreen), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+});
+
+// Prefetch: importar o chunk antecipadamente
+const prefetchOffer = () => import('@/components/offer-screen');
 
 type Screen = 'landing' | 'question' | 'transition' | 'results' | 'offer';
 
@@ -62,6 +71,8 @@ export default function Home() {
     setCurrentScreen('results');
     const value = calculateEstimatedValue(incomeIndex, multipliers);
     trackStep('results', { estimatedLoss: value });
+    // Prefetch da OfferScreen enquanto o usuário vê os resultados
+    prefetchOffer();
   }, [incomeIndex, multipliers, trackStep]);
 
   const handleContinueToOffer = useCallback(() => {
