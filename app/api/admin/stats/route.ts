@@ -26,22 +26,21 @@ export async function GET(request: NextRequest) {
       where: { startedAt: { gte: startDate } }
     });
 
-    // Funil por etapa
+    // Funil por etapa - lógica corrigida
     const funnelSteps = ['landing', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'results', 'offer'];
     const funnel: Record<string, number> = {};
-    
+
+    // Para cada etapa, contar quem chegou nela ou passou por ela
     for (const step of funnelSteps) {
+      const stepIndex = funnelSteps.indexOf(step);
+
+      // Contar usuários que chegaram nesta etapa ou foram além dela
+      const futureSteps = funnelSteps.slice(stepIndex);
+
       funnel[step] = await prisma.quizSession.count({
         where: {
           startedAt: { gte: startDate },
-          OR: [
-            { currentStep: step },
-            // Contar quem passou por essa etapa
-            ...(funnelSteps.indexOf(step) < funnelSteps.length - 1 
-              ? funnelSteps.slice(funnelSteps.indexOf(step) + 1).map(s => ({ currentStep: s }))
-              : []
-            )
-          ]
+          currentStep: { in: futureSteps }
         }
       });
     }

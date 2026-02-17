@@ -175,7 +175,7 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
   };
 
   const handleOfferClick = useCallback(() => {
-    trackStep('offer', { clickedOffer: true, estimatedLoss: totalValue });
+    trackStep('offer_click', { clickedOffer: true, estimatedLoss: totalValue });
   }, [trackStep, totalValue]);
 
   const scrollToCTA = () => {
@@ -283,14 +283,25 @@ export function OfferScreen({ totalValue }: OfferScreenProps) {
           className="space-y-6"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-900">
-            Veja como funciona em 1 minuto
+            Veja como a planilha funciona
           </h2>
           <p className="text-center text-slate-600">
             Tudo que você precisa para tomar o controle do seu dinheiro:
           </p>
           
-          {/* Vídeo demonstrativo */}
-          <VideoPlayer src="/como-funciona-planilha-compressed.mp4" />
+          {/* Imagem da oferta */}
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-emerald-300 shadow-xl">
+              <Image
+                src="/planilha-mockup.webp"
+                alt="Planilha de Organização Financeira"
+                width={400}
+                height={300}
+                className="w-full h-auto"
+                priority
+              />
+            </div>
+          </div>
         </motion.section>
 
         {/* Bloco 3 — Badges de valor */}

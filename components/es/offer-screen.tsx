@@ -175,7 +175,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
   };
 
   const handleOfferClick = useCallback(() => {
-    trackStep('offer', { clickedOffer: true, estimatedLoss: totalValue });
+    trackStep('offer_click_es', { clickedOffer: true, estimatedLoss: totalValue });
   }, [trackStep, totalValue]);
 
   const scrollToCTA = () => {
