@@ -42,3 +42,8 @@ next-env.d.ts
 
 # temp
 NUL
+
+# videos
+*.mp4
+*.mov
+*.avi

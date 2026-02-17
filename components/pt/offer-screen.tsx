@@ -187,7 +187,7 @@ export function OfferScreenPT({ totalValue }: OfferScreenProps) {
       comment: 'Super f\u00e1cil de usar! Finalmente consegui organizar minhas finan\u00e7as sem precisar de um contador. Recomendo demais!'
     },
     {
-      name: 'Carolina R.',
+      name: 'Carlos R.',
       image: '/review-3.jpg',
       comment: 'Melhor investimento que fiz. Agora sei exatamente pra onde vai cada centavo do meu sal\u00e1rio. Deveria ter come\u00e7ado antes!'
     }
