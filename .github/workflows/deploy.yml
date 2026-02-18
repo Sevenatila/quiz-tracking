@@ -1,0 +1,63 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies & Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy to Hostinger using rsync
+        uses: easingthemes/ssh-deploy@v4
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          ARGS: "-rlgoDzvc -i --delete"
+          SOURCE: ".next/standalone/"
+          REMOTE_HOST: "185.213.81.152"      # IP da imagem
+          REMOTE_USER: "u487626657"          # Usuário da imagem
+          REMOTE_PORT: "65002"               # Porta da imagem
+          # ATENÇÃO: Verifique se este caminho está correto no seu servidor via SSH/File Manager
+          # Geralmente é public_html ou uma subpasta dele.
+          TARGET: "/domains/finanzasenorden.shop/public_html" 
+          EXCLUDE: "/node_modules/"
+
+      - name: Restart Application (via SSH)
+        uses: appleboy/ssh-action@master
+        with:
+          host: "185.213.81.152"
+          username: "u487626657"
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: "65002"
+          script: |
+            # Entra na pasta do projeto
+            cd /domains/finanzasenorden.shop/public_html
+            
+            # Instala dependências de produção para o modo standalone
+            # (O rsync acima não envia node_modules para economizar tempo/banda)
+            npm install --production
+            
+            # Reinicia o servidor
+            # Se você usa PM2 (recomendado):
+            if command -v pm2 &> /dev/null; then
+                pm2 reload all || pm2 start server.js --name "nextjs-app"
+            else
+                # Fallback simples (não ideal para produção, mas funciona)
+                # Mata processo anterior na porta 3000 (exemplo) e inicia novo
+                pkill -f server.js || true
+                nohup node server.js > app.log 2>&1 &
+            fi
