@@ -44,10 +44,8 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: "65002"
           script: |
-            # Carrega variáveis de ambiente para encontrar npm/node/pm2
-            source ~/.bashrc || true
-            source ~/.profile || true
-            source ~/.nvm/nvm.sh || true
+            # Adiciona o Node.js da Hostinger ao PATH (V22)
+            export PATH=$PATH:/opt/alt/alt-nodejs22/root/usr/bin
 
             # Entra na pasta do projeto
             cd /home/u487626657/domains/finanzasenorden.shop/public_html
