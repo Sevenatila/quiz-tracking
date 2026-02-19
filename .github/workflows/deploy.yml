@@ -33,7 +33,7 @@ jobs:
           REMOTE_PORT: "65002"               # Porta da imagem
           # ATENÇÃO: Verifique se este caminho está correto no seu servidor via SSH/File Manager
           # Geralmente é public_html ou uma subpasta dele.
-          TARGET: "/domains/finanzasenorden.shop/public_html" 
+          TARGET: "/home/u487626657/domains/finanzasenorden.shop/public_html" 
           EXCLUDE: "/node_modules/"
 
       - name: Restart Application (via SSH)
@@ -45,7 +45,7 @@ jobs:
           port: "65002"
           script: |
             # Entra na pasta do projeto
-            cd /domains/finanzasenorden.shop/public_html
+            cd /home/u487626657/domains/finanzasenorden.shop/public_html
             
             # Instala dependências de produção para o modo standalone
             # (O rsync acima não envia node_modules para economizar tempo/banda)
