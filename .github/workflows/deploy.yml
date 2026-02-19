@@ -43,6 +43,8 @@ jobs:
           username: "u487626657"
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: "65002"
+          timeout: "300s"
+          command_timeout: "30m"
           script: |
             # Adiciona o Node.js da Hostinger ao PATH (V22)
             export PATH=$PATH:/opt/alt/alt-nodejs22/root/usr/bin
@@ -52,7 +54,7 @@ jobs:
             
             # Instala dependências de produção para o modo standalone
             # (O rsync acima não envia node_modules para economizar tempo/banda)
-            npm install --production
+            npm install --production --no-audit --no-fund
             
             # Reinicia o servidor
             # Se você usa PM2 (recomendado):
