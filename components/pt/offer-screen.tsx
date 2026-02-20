@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ShieldCheck, ChevronDown, Zap, Clock, Star, CheckCircle, Play } from 'lucide-react';
+import { Check, ShieldCheck, ChevronDown, Zap, Clock, Star, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/quiz-data';
 import { useTracking } from '@/hooks/use-tracking';
@@ -20,59 +20,6 @@ interface FAQItemProps {
   onClick: () => void;
 }
 
-function VideoPlayer({ src }: { src: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const handlePlay = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const handleVideoClick = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play();
-        setIsPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
-
-  return (
-    <div className="flex justify-center">
-      <div className="relative w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-emerald-300 shadow-xl">
-        <video
-          ref={videoRef}
-          src={src}
-          playsInline
-          preload="metadata"
-          onClick={handleVideoClick}
-          onEnded={() => setIsPlaying(false)}
-          className="w-full cursor-pointer"
-        />
-        {!isPlaying && (
-          <div
-            onClick={handlePlay}
-            className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-2xl shadow-emerald-500/50"
-            >
-              <Play className="w-10 h-10 text-white ml-1" fill="white" />
-            </motion.div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function FAQItem({ question, answer, isOpen, onClick }: FAQItemProps) {
   return (
@@ -243,14 +190,25 @@ export function OfferScreenPT({ totalValue }: OfferScreenProps) {
           className="space-y-6"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-900">
-            Veja como funciona em 1 minuto
+            Veja como a planilha funciona
           </h2>
           <p className="text-center text-slate-600">
             Tudo que voc&ecirc; precisa para tomar o controle do seu dinheiro:
           </p>
 
-          {/* Vídeo demonstrativo */}
-          <VideoPlayer src="/como-funciona-planilha-compressed.mp4" />
+          {/* Imagem da oferta */}
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-emerald-300 shadow-xl">
+              <Image
+                src="/planilha-mockup.webp"
+                alt="Planilha de Organização Financeira"
+                width={400}
+                height={300}
+                className="w-full h-auto"
+                priority
+              />
+            </div>
+          </div>
         </motion.section>
 
         {/* Bloco 3 - Badges de valor */}
