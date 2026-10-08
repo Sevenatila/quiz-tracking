@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useCallback, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Check, ShieldCheck, ChevronDown, Clock, Star, Play } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, ShieldCheck, ChevronDown, Zap, Clock, Infinity, Star, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { formatCurrencyES } from '@/lib/quiz-data-es';
 import { useTracking } from '@/hooks/use-tracking';
-import { useSound } from '@/hooks/use-sound';
 import { useRouter } from 'next/navigation';
+import InlineCheckout, { InlineSuccess } from './inline-checkout';
 
 interface OfferScreenProps {
   totalValue: number;
@@ -19,60 +19,6 @@ interface FAQItemProps {
   answer: string;
   isOpen: boolean;
   onClick: () => void;
-}
-
-function VideoPlayer({ src }: { src: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const handlePlay = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const handleVideoClick = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play();
-        setIsPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
-
-  return (
-    <div className="flex justify-center">
-      <div className="relative w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-emerald-300 shadow-xl">
-        <video
-          ref={videoRef}
-          src={src}
-          playsInline
-          preload="metadata"
-          onClick={handleVideoClick}
-          onEnded={() => setIsPlaying(false)}
-          className="w-full cursor-pointer"
-        />
-        {!isPlaying && (
-          <div
-            onClick={handlePlay}
-            className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-2xl shadow-emerald-500/50"
-            >
-              <Play className="w-10 h-10 text-white ml-1" fill="white" />
-            </motion.div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 }
 
 function FAQItem({ question, answer, isOpen, onClick }: FAQItemProps) {
@@ -103,22 +49,26 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
   const perdaMensal = totalValue;
   const perdaAnual = totalValue * 12;
   const { trackStep } = useTracking();
-  const { playTickSound } = useSound();
   const router = useRouter();
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
-  const ctaRef = useRef<HTMLAnchorElement>(null);
+  const ctaRef = useRef<HTMLButtonElement>(null);
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutos en segundos
-  const [checkoutUrl, setCheckoutUrl] = useState('https://checkout.centerpag.com/pay/PPU38CQ6K3M?');
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
+  const [currentView, setCurrentView] = useState<'offer' | 'checkout' | 'success'>('offer');
 
   useEffect(() => {
-    const sid = localStorage.getItem('quiz_session_id');
-    if (sid) {
-      setCheckoutUrl(`https://checkout.centerpag.com/pay/PPU38CQ6K3M?src=${sid}`);
-    }
-  }, []);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
+    // Adicionar script UTM
+    const script = document.createElement('script');
+    script.src = 'https://cdn.utmify.com.br/scripts/utms/latest.js';
+    script.setAttribute('data-utmify-prevent-xcod-sck', '');
+    script.setAttribute('data-utmify-prevent-subids', '');
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
 
     // Back redirect code
     const setBackRedirect = (url: string) => {
@@ -148,6 +98,12 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
     const cleanupBackRedirect = setBackRedirect('/es/back-redirect');
 
     return () => {
+      // Cleanup - remover script quando componente desmontar
+      const existingScript = document.querySelector('script[src="https://cdn.utmify.com.br/scripts/utms/latest.js"]');
+      if (existingScript) {
+        document.head.removeChild(existingScript);
+      }
+      // Cleanup back redirect
       if (cleanupBackRedirect) cleanupBackRedirect();
     };
   }, []);
@@ -155,7 +111,6 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      playTickSound();
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
@@ -166,7 +121,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [playTickSound]);
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -175,8 +130,47 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
   };
 
   const handleOfferClick = useCallback(() => {
-    trackStep('offer_click_es', { clickedOffer: true, estimatedLoss: totalValue });
+    trackStep('offer', { clickedOffer: true, estimatedLoss: totalValue });
+    setCurrentView('checkout');
   }, [trackStep, totalValue]);
+
+  const handlePaymentSuccess = useCallback(async (paymentIntentId: string) => {
+    trackStep('payment_success', { paymentIntentId, amount: 9.90, currency: 'usd' });
+
+    try {
+      // Buscar order ID baseado no payment intent
+      const response = await fetch(`/api/orders/by-payment-intent/${paymentIntentId}`);
+      const data = await response.json();
+
+      if (data.orderId) {
+        // Redirecionar para página de download
+        window.location.href = `/download/${data.orderId}`;
+      } else {
+        // Fallback para tela de sucesso inline se não encontrar order
+        setCurrentView('success');
+      }
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      // Fallback para tela de sucesso inline
+      setCurrentView('success');
+    }
+  }, [trackStep]);
+
+  const handleBackToOffer = useCallback(() => {
+    setCurrentView('offer');
+  }, []);
+
+  const handleSuccessContinue = useCallback(() => {
+    setCurrentView('offer');
+    // Ou redirecionar para onde preferir
+  }, []);
+
+  const handlePaymentError = useCallback((error: string) => {
+    setCheckoutError(error);
+    trackStep('payment_error', { error });
+    // Mostrar error por 5 segundos
+    setTimeout(() => setCheckoutError(''), 5000);
+  }, [trackStep]);
 
   const scrollToCTA = () => {
     ctaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -217,7 +211,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
       comment: '¡Súper fácil de usar! Por fin pude organizar mis finanzas sin necesitar un contador. ¡Lo recomiendo mucho!'
     },
     {
-      name: 'Rafael G.',
+      name: 'Carolina R.',
       image: '/review-3.jpg',
       comment: 'Mejor inversión que he hecho. Ahora sé exactamente a dónde va cada centavo de mi sueldo. ¡Debí haberlo empezado antes!'
     }
@@ -225,17 +219,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
 
   return (
     <div className="min-h-screen">
-
-      {/* Cronómetro fijo en el tope */}
-      <div className={`fixed top-0 left-0 right-0 z-50 ${timeLeft <= 60 ? 'bg-red-600' : 'bg-gradient-to-r from-orange-500 to-red-500'} shadow-lg`}>
-        <div className="max-w-lg mx-auto flex items-center justify-center gap-3 py-2.5 px-4">
-          <Clock className="w-5 h-5 text-white animate-pulse" />
-          <span className="text-white font-semibold text-sm">Oferta expira en:</span>
-          <span className="text-white font-bold text-xl tracking-wider">{formatTime(timeLeft)}</span>
-        </div>
-      </div>
-
-      <div className="max-w-lg mx-auto px-6 pt-20 pb-12 space-y-12">
+      <div className="max-w-lg mx-auto px-6 py-12 space-y-12">
         
         {/* Bloque 1 — Dolor/Impacto */}
         <motion.section
@@ -270,18 +254,44 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
           className="space-y-6"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-900">
-            Mira cómo funciona en 1 minuto
+            La Plantilla de Finanzas Personales
           </h2>
           <p className="text-center text-slate-600">
             Todo lo que necesitas para tomar el control de tu dinero:
           </p>
           
-          {/* Vídeo demonstrativo */}
-          <VideoPlayer src="/como-funciona-planilha-compressed.mp4" />
+          {/* Mockup visual */}
+          <div className="flex justify-center">
+            <Image
+              src="/planilha-mockup-es.png"
+              alt="Hoja de organización y control financiero"
+              width={400}
+              height={300}
+              className="rounded-2xl"
+            />
+          </div>
+
+          {/* Lista de beneficios */}
+          <ul className="space-y-3">
+            {beneficios.map((beneficio, index) => (
+              <motion.li
+                key={index}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                className="flex items-start gap-3"
+              >
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center mt-0.5">
+                  <Check className="w-4 h-4 text-emerald-600" />
+                </div>
+                <span className="text-slate-700">{beneficio}</span>
+              </motion.li>
+            ))}
+          </ul>
         </motion.section>
 
 
@@ -289,15 +299,32 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center space-y-4"
         >
           <h3 className="text-2xl font-bold text-slate-900">
             Oferta especial para ti
           </h3>
 
+          {/* Contador Regresivo */}
+          <motion.div
+            animate={{ scale: timeLeft <= 60 ? [1, 1.05, 1] : 1 }}
+            transition={{ duration: 0.5, repeat: timeLeft <= 60 ? 999 : 0 }}
+            className={`inline-flex items-center gap-2 px-4 py-3 rounded-xl ${
+              timeLeft <= 60 ? 'bg-red-100 border-2 border-red-500' : 'bg-orange-100 border-2 border-orange-500'
+            }`}
+          >
+            <Clock className={`w-5 h-5 ${timeLeft <= 60 ? 'text-red-600' : 'text-orange-600'}`} />
+            <div>
+              <p className="text-xs text-slate-600 font-medium">Oferta expira en:</p>
+              <p className={`text-2xl font-bold ${timeLeft <= 60 ? 'text-red-600' : 'text-orange-600'}`}>
+                {formatTime(timeLeft)}
+              </p>
+            </div>
+          </motion.div>
+
           {/* Comparativo ANTES/AHORA */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mt-6">
             <div className="bg-white border border-slate-200 rounded-xl p-4">
               <p className="text-sm text-slate-500 mb-1">ANTES</p>
               <p className="text-sm text-slate-400">Sin la oferta</p>
@@ -315,35 +342,57 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
           </p>
         </motion.section>
 
-        {/* Bloque 5 — CTA */}
+        {/* Bloque 5 — CTA ou Checkout */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
           className="space-y-4"
         >
-          <motion.a
-            ref={ctaRef}
-            href={checkoutUrl}
-            onClick={handleOfferClick}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="block w-full py-5 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg rounded-xl transition-colors shadow-lg shadow-emerald-500/30 text-center"
-          >
-            Quiero la plantilla
-          </motion.a>
+          {currentView === 'offer' ? (
+            <>
+              <motion.button
+                ref={ctaRef}
+                onClick={handleOfferClick}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-5 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg rounded-xl transition-colors shadow-lg shadow-emerald-500/30"
+              >
+                Quiero la plantilla
+              </motion.button>
 
-          <div className="flex items-center justify-center gap-2 text-slate-500 text-sm">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Garantía de 30 días. Si no funciona, te devolvemos tu dinero.</span>
-          </div>
+              <div className="flex items-center justify-center gap-2 text-slate-500 text-sm">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Garantía de 30 días. Si no funciona, te devolvemos tu dinero.</span>
+              </div>
+            </>
+          ) : currentView === 'checkout' ? (
+            <InlineCheckout
+              amount={9.90}
+              isVisible={true}
+              onSuccess={handlePaymentSuccess}
+              onError={handlePaymentError}
+              onBack={handleBackToOffer}
+            />
+          ) : (
+            <InlineSuccess
+              isVisible={true}
+              onContinue={handleSuccessContinue}
+            />
+          )}
+
+          {checkoutError && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{checkoutError}</p>
+            </div>
+          )}
         </motion.section>
 
         {/* Bloque 6 — Reviews */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.25 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="space-y-6"
         >
           <h3 className="text-xl font-bold text-center text-slate-900">
@@ -355,7 +404,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
                 className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
               >
                 <div className="flex items-start gap-3">
@@ -364,9 +413,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
                       src={review.image}
                       alt={review.name}
                       fill
-                      sizes="48px"
                       className="object-cover"
-                      loading="lazy"
                     />
                   </div>
                   <div className="flex-1">
@@ -390,7 +437,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
           className="space-y-4"
         >
           <h3 className="text-xl font-bold text-center text-slate-900">
@@ -413,7 +460,7 @@ export function OfferScreenES({ totalValue }: OfferScreenProps) {
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
           className="text-center text-xs text-slate-400 pb-8"
         >
           <p>Aviso importante sobre este producto</p>

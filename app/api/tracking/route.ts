@@ -7,10 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      sessionId, step, incomeRange, estimatedLoss, clickedOffer,
-      utmSource, utmMedium, utmCampaign,
-    } = body;
+    const { sessionId, step, incomeRange, estimatedLoss, clickedOffer, utmSource, utmMedium, utmCampaign } = body;
 
     if (!sessionId) {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });

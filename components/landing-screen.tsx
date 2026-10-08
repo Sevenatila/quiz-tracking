@@ -41,10 +41,9 @@ export default function LandingScreen({ onStart }: LandingScreenProps) {
           className="mb-3 relative w-full aspect-square max-w-[320px] mx-auto"
         >
           <Image
-            src="/hamster-wheel.webp"
+            src="/hamster-wheel.png"
             alt="Ciclo financeiro: trabalha para ganhar dinheiro para pagar contas até ficar sem dinheiro"
             fill
-            sizes="(max-width: 768px) 320px, 320px"
             className="object-contain rounded-2xl"
             priority
           />

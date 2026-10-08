@@ -9,14 +9,6 @@ import { useTracking } from '@/hooks/use-tracking';
 export default function BackRedirectPageES() {
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutos en segundos
   const { trackStep } = useTracking();
-  const [checkoutUrl, setCheckoutUrl] = useState('https://checkout.planilhaorganizacaofinanceira.online/VCCL1O8SCMGO');
-
-  useEffect(() => {
-    const sid = localStorage.getItem('quiz_session_id');
-    if (sid) {
-      setCheckoutUrl(`https://checkout.planilhaorganizacaofinanceira.online/VCCL1O8SCMGO?src=${sid}`);
-    }
-  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -126,7 +118,7 @@ export default function BackRedirectPageES() {
 
             {/* CTA Principal */}
             <motion.a
-              href={checkoutUrl}
+              href="https://checkout.planilhaorganizacaofinanceira.online/VCCL1O8SCMGO"
                             whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="block w-full py-6 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-xl text-center transition-colors shadow-lg shadow-emerald-500/30"
@@ -186,7 +178,7 @@ export default function BackRedirectPageES() {
           className="text-center mt-8"
         >
           <motion.a
-            href={checkoutUrl}
+            href="https://checkout.planilhaorganizacaofinanceira.online/VCCL1O8SCMGO"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.02 }}

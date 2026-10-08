@@ -7,7 +7,7 @@ function generateSessionId(): string {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('quiz_session_id');
     if (stored) return stored;
-
+    
     // Gera novo ID
     const newId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     localStorage.setItem('quiz_session_id', newId);
@@ -50,7 +50,6 @@ export function useTracking() {
   }) => {
     if (!sessionId.current) return;
 
-    // Tracking interno no servidor
     try {
       await fetch('/api/tracking', {
         method: 'POST',
@@ -60,7 +59,6 @@ export function useTracking() {
           step,
           ...additionalData,
           ...getUtmParams(),
-          pageUrl: window.location.href,
         }),
       });
     } catch (error) {
